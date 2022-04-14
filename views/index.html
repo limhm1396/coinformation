@@ -1,6 +1,28 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h1>{{ title }}</h1>
-<p>Welcome to {{ title }}</p>
+<div>
+  <table role="grid">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">한글명</th>
+        <th scope="col">영문명</th>
+        <th scope="col">티커</th>
+        <th scope="col">현재가</th>
+        <th scope="col">최대낙폭지수</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">1</th>
+        <td>Cell</td>
+        <td>Cell</td>
+        <td>Cell</td>
+        <td>Cell</td>
+        <td>Cell</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 {% endblock %}

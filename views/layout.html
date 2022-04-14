@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html lang="kr">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-    <title>CoInformation</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+  <title>CoInformation</title>
 </head>
+
 <body>
+  <main class="container">
+    <div>
+      <nav>
+        <ul>
+          <li><strong><a href="#">CoInformation</a></strong></li>
+        </ul>
+        <ul>
+          <li><a href="#" role="button">로그인</a></li>
+          <li><a href="#" role="button">회원가입</a></li>
+        </ul>
+      </nav>
+    </div>
+    <hr>
     {% block content %}
     {% endblock %}
+  </main>
 </body>
+
 </html>
