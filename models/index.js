@@ -4,8 +4,13 @@ const { config } = require('../config/config.js');
 
 const sequelize = new Sequelize(config);
 
-const db = {}
+const Market = require('./markets');
 
-db.sequelize = sequelize;
+Market.init(sequelize);
+
+const db = {
+    sequelize,
+    Market,
+}
 
 module.exports = db;
