@@ -5,23 +5,21 @@
   <table role="grid">
     <thead>
       <tr>
-        <th scope="col"></th>
-        <th scope="col">한글명</th>
-        <th scope="col">영문명</th>
-        <th scope="col">티커</th>
-        <th scope="col">현재가</th>
-        <th scope="col">최대낙폭지수</th>
+        <th scope="col">No.</th>
+        <th scope="col">마켓</th>
+        <th scope="col">MDD</th>
       </tr>
     </thead>
     <tbody>
+      {% set count = 1 %}
+      {% for mdd in mdds %}
       <tr>
-        <th scope="row">1</th>
-        <td>Cell</td>
-        <td>Cell</td>
-        <td>Cell</td>
-        <td>Cell</td>
-        <td>Cell</td>
+        <td>{{ count }}</td>
+        <td>{{ mdd.market }}</td>
+        <td>{{ mdd.mdd }}%</td>
       </tr>
+      {% set count = count + 1 %}
+      {% endfor %}
     </tbody>
   </table>
 </div>
