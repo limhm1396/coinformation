@@ -1,5 +1,5 @@
+// dotenv
 const dotenv = require('dotenv');
-
 dotenv.config();
 
 const createError = require('http-errors');
@@ -29,8 +29,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// sequelize
 const { sequelize } = require('./models');
-
 sequelize.sync({ force: false, alter: false })
   .then(() => {
     console.log('DB is running.');
@@ -38,6 +38,10 @@ sequelize.sync({ force: false, alter: false })
   .catch(() => {
     console.error('DB is shutdown.');
   });
+
+// redis
+const redis = require('./redis');
+redis.connect();
 
 app.use('/', indexRouter);
 
