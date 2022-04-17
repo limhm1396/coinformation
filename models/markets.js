@@ -8,6 +8,10 @@ class Market extends Model {
                 allowNull: false,
                 primaryKey: true,
             },
+            ticker: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
             korean_name: {
                 type: DataTypes.STRING,
                 allowNull: false,
