@@ -201,7 +201,7 @@ class Coin {
             where: {
                 market: marketCode,
             },
-            order: [['date', 'ASC']],
+            order: [['date', 'DESC']],
         });
     }
 

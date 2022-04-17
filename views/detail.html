@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div>
+    <h1>{{ market.korean_name }}</h1>
+</div>
+<div>
+    <table role="grid">
+        <thead>
+            <tr>
+                <th scope="col">날짜</th>
+                <th scope="col">종가</th>
+                <th scope="col">최고가</th>
+                <th scope="col">MDD</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for history in histories %}
+            <tr>
+                <td>{{ history.date }}</td>
+                <td>{{ history.trade_price }}</td>
+                <td>{{ history.highest_price }}</td>
+                <td>{{ history.mdd }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
