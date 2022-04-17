@@ -141,8 +141,8 @@ class Coin {
                     market: market.market,
                     korean_name,
                     english_name,
-                    current_price,
-                    highest_price,
+                    current_price: current_price.toLocaleString('ko-KR'),
+                    highest_price: highest_price.toLocaleString('ko-KR'),
                     mdd,
                 });
             }
