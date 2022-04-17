@@ -14,15 +14,15 @@ class MarketHistory extends Model {
                 primaryKey: true,
             },
             trade_price: {
-                type: DataTypes.DECIMAL,
+                type: DataTypes.FLOAT,
                 allowNull: false,
             },
             highest_price: {
-                type: DataTypes.DECIMAL,
+                type: DataTypes.FLOAT,
                 allowNull: false,
             },
             mdd: {
-                type: DataTypes.DECIMAL,
+                type: DataTypes.FLOAT,
                 allowNull: false,
             },
         }, {
