@@ -4,7 +4,7 @@ class MarketHistory extends Model {
     static init(sequelize) {
         return super.init({
             market: {
-                type: DataTypes.STRING,
+                type: DataTypes.STRING(50),
                 allowNull: false,
                 primaryKey: true,
             },
