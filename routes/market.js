@@ -5,6 +5,9 @@ const router = express.Router();
 const Service = require('../services/market');
 
 router.get('/:market', async (req, res, next) => {
+  const marketCode = req.params.market;
+  const who = req.ip;
+  await Service.recordVisitor(who, marketCode);
   return res.render('detail');
 });
 
