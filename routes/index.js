@@ -12,6 +12,6 @@ router.get('/', async (req, res, next) => {
 
 const marketRouter = require('./market');
 
-router.use('/market', marketRouter);
+router.use('/markets', marketRouter);
 
 module.exports = router;

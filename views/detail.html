@@ -1,29 +1,48 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
 <div>
-    <h1>{{ market.ticker }} | {{ market.korean_name }} | {{ market.english_name }}</h1>
+    <h1 id="heading"></h1>
 </div>
 <div>
-    <table role="grid">
-        <thead>
-            <tr>
-                <th scope="col">날짜</th>
-                <th scope="col">종가</th>
-                <th scope="col">최고가</th>
-                <th scope="col">MDD</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for history in histories %}
-            <tr>
-                <td>{{ history.date }}</td>
-                <td>{{ history.trade_price }}</td>
-                <td>{{ history.highest_price }}</td>
-                <td>{{ history.mdd }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <canvas id="mdd_chart"></canvas>
 </div>
+<script>
+    const url = location.pathname + '/detail';
+    (async () => {
+        const options = { method: 'GET', headers: { Accept: 'application/json' } };
+        const res = await fetch(url, options);
+        const { market, histories } = await res.json();
+        console.log(histories);
+
+        document.querySelector('#heading')
+            .textContent = `${market.ticker} | ${market.korean_name} | ${market.english_name}`;
+
+        const data = {
+            datasets: [{
+                label: `${market.ticker} 30 DAYS MDD CHART`,
+                backgroundColor: '#039be5',
+                borderColor: '#039be5',
+                data: histories,
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                parsing: {
+                    xAxisKey: 'date',
+                    yAxisKey: 'mdd',
+                }
+            }
+        };
+
+        const myChart = new Chart(
+            document.getElementById('mdd_chart'),
+            config,
+        );
+    })();
+</script>
 {% endblock %}

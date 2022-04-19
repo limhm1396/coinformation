@@ -2,19 +2,16 @@ const express = require('express');
 
 const router = express.Router();
 
-const { Market } = require('../models');
-
-const Coin = require('../modules/coin');
+const Market_Service = require('../services/market');
 
 router.get('/:market', async (req, res, next) => {
+  return res.render('detail');
+});
+
+router.get('/:market/detail', async (req, res, next) => {
   const marketCode = req.params.market;
-  const market = await Market.findOne({
-    where: {
-      market: marketCode,
-    }
-  });
-  const histories = await Coin.getMarketHistories(marketCode);
-  return res.render('detail', { market, histories });
-})
+  const result = await Market_Service.detail(marketCode);
+  return res.send(result);
+});
 
 module.exports = router;
