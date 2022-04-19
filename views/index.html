@@ -1,6 +1,22 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+<form action="/" method="GET">
+  <div class="grid">
+    <div style="width: 25%;"></div>
+    <input type="text" name="q" list="coin_list">
+    <datalist id="coin_list">
+      {% for mdd in mdds %}
+      <option value="{{ mdd.ticker }}">
+      <option value="{{ mdd.korean_name }}">
+      <option value="{{ mdd.english_name }}">
+      {% endfor %}
+    </datalist>
+    <button type="submit">검색</button>
+    <div style="width: 25%;"></div>
+  </div>
+</form>
+<hr>
 <div>
   <table role="grid">
     <thead>

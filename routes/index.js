@@ -2,12 +2,13 @@ const express = require('express');
 
 const router = express.Router();
 
-const Coin = require('../modules/coin');
+const Service = require('../services');
 
 /* GET home page. */
 router.get('/', async (req, res, next) => {
-  const mdds = await Coin.getMarketsMDD();
-  return res.render('index', { mdds });
+  const q = req.query.q;
+  const result = await Service.getMdds(q);
+  return res.render('index', result);
 });
 
 const marketRouter = require('./market');

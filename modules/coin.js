@@ -144,16 +144,15 @@ class Coin {
                     }
                 });
 
-                const korean_name = market.korean_name;
-                const english_name = market.english_name;
                 const current_price = Number(info.trade_price);
                 const highest_price = Number(info.highest_52_week_price);
                 const mdd = this.getMdd(current_price, highest_price);
 
                 market_mdds.push({
+                    ticker: market.ticker,
                     market: market.market,
-                    korean_name,
-                    english_name,
+                    korean_name: market.korean_name,
+                    english_name: market.english_name,
                     current_price: current_price.toLocaleString('ko-KR'),
                     highest_price: highest_price.toLocaleString('ko-KR'),
                     mdd,
