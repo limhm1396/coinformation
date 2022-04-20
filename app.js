@@ -1,7 +1,3 @@
-// dotenv
-const dotenv = require('dotenv');
-dotenv.config();
-
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -29,20 +25,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// sequelize
-const { sequelize } = require('./models');
-sequelize.sync({ force: false, alter: false })
-  .then(() => {
-    console.log('DB is running.');
-  })
-  .catch(() => {
-    console.error('DB is shutdown.');
-  });
-
-// redis
-const redis = require('./redis');
-redis.connect();
-
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
@@ -59,10 +41,6 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
-});
-
-app.listen(app.get('port'), () => {
-  console.log(app.get('port'), 'port server is running!');
 });
 
 module.exports = app;
