@@ -36,25 +36,37 @@ class Coin {
      * @description 업비트에서 가져온 마켓 목록 저장하기
      */
     static updateMarkets = async () => {
-        const coins = await this.getKrwMarketsFromUpbit(); // 밑에 for문에서 변수명이 겹치지 않기 위해 이렇게 만듬.
+        const transaction = await sequelize.transaction();
 
-        for (let coin of coins) {
-            const market = String(coin.market);
-            const ticker = market.slice(4);
-            const korean_name = String(coin.korean_name);
-            const english_name = String(coin.english_name);
+        try {
+            await Market.destroy({
+                where: {},
+                transaction,
+            });
 
-            await Market.findOrCreate({
-                where: {
-                    market,
-                },
-                defaults: {
+            const coins = await this.getKrwMarketsFromUpbit(); // 밑에 for문에서 변수명이 겹치지 않기 위해 이렇게 만듬.
+
+            for (let coin of coins) {
+                const market = String(coin.market);
+                const ticker = market.slice(4);
+                const korean_name = String(coin.korean_name);
+                const english_name = String(coin.english_name);
+
+                await Market.upsert({
                     market,
                     ticker,
                     korean_name,
                     english_name,
-                },
-            });
+                    delete_at: null,
+                }, {
+                    transaction,
+                });
+            }
+
+            await transaction.commit();
+        } catch (err) {
+            console.log(err);
+            await transaction.rollback();
         }
     }
 
@@ -194,7 +206,7 @@ class Coin {
      * @param {Number} days 조회기간 e.g. 30
      * @returns {MarketHistory[]}
      */
-    static getMarketHistories = async (marketCode, days=30) => {
+    static getMarketHistories = async (marketCode, days = 30) => {
         await this.updateMarketHistories(marketCode);
 
         return await MarketHistory.findAll({

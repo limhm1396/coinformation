@@ -24,7 +24,11 @@ class Market extends Model {
             sequelize,
             modelName: 'market',
             tableName: 'markets',
-            timestamps: false,
+            timestamps: true,
+            createdAt: false,
+            updatedAt: false,
+            paranoid: true,
+            deletedAt: 'delete_at',
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
         });
