@@ -3,43 +3,40 @@
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
 <div>
-    <h1 id="heading"></h1>
+    <h1>가장 많이 검색한 코인</h1>
 </div>
 <div>
-    <canvas id="mdd_chart"></canvas>
+    <canvas id="chart"></canvas>
 </div>
 <script>
     const url = location.pathname + '/detail';
     (async () => {
         const options = { method: 'GET', headers: { Accept: 'application/json' } };
         const res = await fetch(url, options);
-        const { market, histories } = await res.json();
-
-        document.querySelector('#heading')
-            .textContent = `${market.ticker} | ${market.korean_name} | ${market.english_name}`;
+        const { ranking } = await res.json();
 
         const data = {
             datasets: [{
-                label: `${market.ticker} 30 DAYS MDD`,
+                label: 'Ranking',
                 backgroundColor: '#039be5',
                 borderColor: '#039be5',
-                data: histories,
+                data: ranking,
             }]
         };
 
         const config = {
-            type: 'line',
+            type: 'bar',
             data: data,
             options: {
                 parsing: {
-                    xAxisKey: 'date',
-                    yAxisKey: 'mdd',
+                    xAxisKey: 'market.korean_name',
+                    yAxisKey: 'count',
                 }
             }
         };
 
         const myChart = new Chart(
-            document.getElementById('mdd_chart'),
+            document.getElementById('chart'),
             config,
         );
     })();

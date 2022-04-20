@@ -12,6 +12,10 @@ Market.init(sequelize);
 MarketHistory.init(sequelize);
 SearchHistory.init(sequelize);
 
+// Relationship
+Market.hasMany(SearchHistory, { foreignKey: 'market_code' });
+SearchHistory.belongsTo(Market, { foreignKey: 'market_code', onUpdate: 'CASCADE', onDelete: 'CASCADE', });
+
 const db = {
     sequelize,
     Market,

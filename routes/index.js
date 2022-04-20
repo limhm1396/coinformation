@@ -12,7 +12,9 @@ router.get('/', async (req, res, next) => {
 });
 
 const marketRouter = require('./market');
+const statisticRouter = require('./statistic');
 
 router.use('/markets', marketRouter);
+router.use('/statistics', statisticRouter);
 
 module.exports = router;

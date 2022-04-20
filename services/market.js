@@ -24,12 +24,12 @@ class Service {
         await SearchHistory.findOrCreate({
             where: {
                 who,
-                market,
+                market_code: market,
                 date,
             },
             defaults: {
                 who,
-                market,
+                market_code: market,
             }
         });
     }

@@ -8,7 +8,7 @@ class SearchHistory extends Model {
                 allowNull: false,
                 primaryKey: true,
             },
-            market: {
+            market_code: {
                 type: DataTypes.STRING(50),
                 allowNull: false,
                 primaryKey: true,
