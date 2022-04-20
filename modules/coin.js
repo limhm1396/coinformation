@@ -172,7 +172,7 @@ class Coin {
             }
 
             await redis.set('markets_mdd', JSON.stringify(market_mdds), {
-                EX: 1,
+                EX: 60,
             });
 
             return market_mdds;

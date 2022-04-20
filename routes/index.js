@@ -6,7 +6,7 @@ const Service = require('../services');
 
 /* GET home page. */
 router.get('/', async (req, res, next) => {
-  const q = req.query.q;
+  const { q } = req.query;
   const result = await Service.getMdds(q);
   return res.render('index', result);
 });

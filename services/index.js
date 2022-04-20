@@ -1,24 +1,31 @@
 const Coin = require('../modules/coin');
 
 class Service {
-    static getMdds = async (q='') => {
+    static getMdds = async (q = '') => {
         const given_mdds = await Coin.getMarketsMDD();
-        const mdds = [];
 
         if (q) {
-            const regexp = new RegExp(`.*${q}.*`, 'i');
-            given_mdds.forEach((mdd) => {
-                const ticker = String(mdd.market);
-                const korean_name = String(mdd.korean_name);
-                const english_name = String(mdd.english_name);
-                if (regexp.test(ticker) || regexp.test(korean_name) || regexp.test(english_name)) {
-                    mdds.push(mdd);
-                }
-            });
-        } else {
-            mdds.push(...given_mdds);
+            const search_mdds = this.searchMdds(given_mdds, q);
+            return { mdds: search_mdds };
         }
-        return { mdds };
+
+        return { mdds: given_mdds };
+    }
+
+    static searchMdds = (mdds, q) => {
+        const regexp = new RegExp(`.*${q}.*`, 'i');
+
+        return mdds.reduce((result, mdd) => {
+            const ticker = String(mdd.market);
+            const ko_nm = String(mdd.korean_name);
+            const en_nm = String(mdd.english_name);
+
+            if (regexp.test(ticker) || regexp.test(ko_nm) || regexp.test(en_nm)) {
+                result.push(mdd);
+            }
+
+            return result;
+        }, []);
     }
 }
 
