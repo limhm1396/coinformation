@@ -1,7 +1,10 @@
 const fetch = require('node-fetch');
 
 const redis = require('../redis');
-const { getTTL } = require('./time');
+const {
+    getTTL,
+    sleep,
+} = require('./time');
 const { sequelize } = require('../models');
 
 const UPBIT = require('../common/upbit');
@@ -65,7 +68,6 @@ class Coin {
 
             await transaction.commit();
         } catch (err) {
-            console.log(err);
             await transaction.rollback();
         }
     }
@@ -75,56 +77,7 @@ class Coin {
      * @returns {Array} markets
      */
     static getMarkets = async () => {
-        const markets = await redis.get('markets');
-
-        if (!markets) {
-            await this.updateMarkets();
-
-            const markets = await Market.findAll();
-
-            await redis.set('markets', JSON.stringify(markets), {
-                EX: getTTL(),
-            })
-
-            return markets;
-        } else {
-            return JSON.parse(markets);
-        }
-    }
-
-    /**
-     * @description markets[]에서 마켓코드만 추출해 Array로 반환하기
-     * @param {Market[]} markets require
-     * @returns {String[]} markets_code[]
-     */
-    static getMarketsCode = (markets) => {
-        return markets.map((market) => {
-            const code = String(market.market);
-            return code;
-        });
-    }
-
-    /**
-     * @description 업비트에서 마켓 시세 정보 가져오기
-     * @param {Market[]} markets
-     * @returns {Array} infos
-     */
-    static getMarketsInfoFromUpbit = async (markets) => {
-        if (!markets) {
-            markets = await this.getMarkets();
-        }
-
-        const base_url = UPBIT.UPBIT_MARKET_CURRENT_INFO;
-        const options = UPBIT.GET_OPTIONS;
-
-        const codes = this.getMarketsCode(markets);
-        const full_url = base_url + String(codes);
-
-        const res = await fetch(full_url, options);
-        const data = await res.json();
-        const infos = Array.from(data);
-
-        return infos;
+        return await Market.findAll();
     }
 
     /**
@@ -139,50 +92,7 @@ class Coin {
     }
 
     /**
-     * @description 마켓 정보, 현 시세와 계산된 MDD 값이 포함된 Array 반환
-     * @returns {Array} market_mdds
-     */
-    static getMarketsMDD = async () => {
-        const market_mdds = await redis.get('markets_mdd');
-
-        if (!market_mdds) {
-            const infos = await this.getMarketsInfoFromUpbit();
-
-            const market_mdds = [];
-            for (let info of infos) {
-                const market = await Market.findOne({
-                    where: {
-                        market: String(info.market),
-                    }
-                });
-
-                const current_price = Number(info.trade_price);
-                const highest_price = Number(info.highest_52_week_price);
-                const mdd = this.getMdd(current_price, highest_price);
-
-                market_mdds.push({
-                    ticker: market.ticker,
-                    market: market.market,
-                    korean_name: market.korean_name,
-                    english_name: market.english_name,
-                    current_price: current_price.toLocaleString('ko-KR'),
-                    highest_price: highest_price.toLocaleString('ko-KR'),
-                    mdd,
-                });
-            }
-
-            await redis.set('markets_mdd', JSON.stringify(market_mdds), {
-                EX: 60,
-            });
-
-            return market_mdds;
-        } else {
-            return JSON.parse(market_mdds);
-        }
-    }
-
-    /**
-     * @description CandleUrl(생성자 함수)
+     * @description CandleUrl class
      * @param {String} url 
      * @param {String} market 
      * @param {String} to 
@@ -219,35 +129,56 @@ class Coin {
     }
 
     /**
-     * @description 마켓 히스토리 업데이트
-     * @param {String} marketCode e.g. KRW-BTC
+     * @description 오늘 0시 0분 0초 Date 리턴
+     * @returns Date
      */
-    static updateMarketHistories = async (marketCode) => {
-        const history = await MarketHistory.findOne({
+    static initDate() {
+        const date = new Date();
+        date.setHours(0);
+        date.setMinutes(0);
+        date.setSeconds(0);
+        date.setMilliseconds(0);
+        return date;
+    }
+
+    /**
+     * @description 날짜 차이 리턴
+     * @param {Date} start_dt 
+     * @param {Date} end_dt 
+     * @returns {Number} days 차이나는 일 수
+     */
+    static diffDays(start_dt, end_dt) {
+        const diff = end_dt - start_dt;
+        const temp = diff / (24 * 60 * 60 * 1000);
+        return Math.floor(temp);
+    }
+
+    /**
+     * @description 마켓 히스토리 업데이트
+     * @param {String} market e.g. KRW-BTC
+     */
+    static updateMarketHistories = async (market) => {
+        const latest_history = await MarketHistory.findOne({
             where: {
-                market: marketCode,
+                market,
             },
             order: [['date', 'DESC']],
         });
 
         const url = UPBIT.UPBIT_MARKET_CANDLE_DAYS;
         const options = UPBIT.GET_OPTIONS;
+        const date = this.initDate();
 
-        const date = new Date();
-        date.setDate(date.getDate() - 1);
+        const candleUrl = new this.CandleUrl(url, market, date.toISOString());
 
-        const candleUrl = new this.CandleUrl(url, marketCode, date.toISOString());
-
-        if (history) {
+        if (latest_history) {
+            const latest_date = new Date(latest_history.date);
+            const diff_days = this.diffDays(latest_date, date);
+            if (!diff_days) {
+                return;
+            }
             candleUrl.isFirstTime = false;
-
-            const latest_date = new Date(history.date);
-
-            const diff = date - latest_date;
-            const temp = diff / (24 * 60 * 60 * 1000);
-            const count = Math.floor(temp);
-
-            candleUrl.count = String(count);
+            candleUrl.count = diff_days;
         } else {
             candleUrl.isFirstTime = true;
         }
@@ -255,15 +186,15 @@ class Coin {
         const histories = [];
         let length = 0;
         do {
+            await sleep(500);
             const res = await fetch(candleUrl.getUrl(), options);
             const json = await res.json();
             const data = Array.from(json);
 
             histories.push(...data);
 
-            const str_date = data[data.length - 1].candle_date_time_utc;
-            const date = new Date(str_date)
-            candleUrl.to = date.toISOString();
+            const end_dt = data[data.length - 1].candle_date_time_utc + 'Z';
+            candleUrl.to = new Date(end_dt).toISOString();
 
             length = data.length;
 
@@ -278,24 +209,24 @@ class Coin {
         if (candleUrl.isFirstTime) {
             highest_price = 0;
         } else {
-            highest_price = history.highest_price;
+            highest_price = latest_history.highest_price;
         }
 
         const transaction = await sequelize.transaction();
         try {
             for (let history of histories) {
-                const date = new Date(history.candle_date_time_kst);
+                const date = new Date(history.candle_date_time_utc + 'Z');
                 const trade_price = history.trade_price;
                 highest_price = Math.max(history.high_price, highest_price);
                 const mdd = this.getMdd(trade_price, highest_price);
 
                 await MarketHistory.findOrCreate({
                     where: {
-                        market: marketCode,
+                        market,
                         date,
                     },
                     defaults: {
-                        market: marketCode,
+                        market,
                         date,
                         trade_price,
                         highest_price,
@@ -306,8 +237,16 @@ class Coin {
             }
             await transaction.commit();
         } catch (err) {
-            console.log(err);
             await transaction.rollback();
+        }
+    }
+
+    static updateAllMarketHistories = async () => {
+        await this.updateMarkets();
+        const markets = await this.getMarkets();
+        for (let market of markets) {
+            const market_code = market.market;
+            await this.updateMarketHistories(market_code);
         }
     }
 }
