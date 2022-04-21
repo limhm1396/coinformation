@@ -12,3 +12,7 @@ exports.getTTL = () => {
 
     return Math.floor(diff_second);
 };
+
+exports.sleep = (ms) => {
+    return new Promise((r) => setTimeout(r, ms));
+}
