@@ -1,8 +1,6 @@
 const fetch = require('node-fetch');
 
-const redis = require('../redis');
 const {
-    getTTL,
     sleep,
 } = require('./time');
 const { sequelize } = require('../models');

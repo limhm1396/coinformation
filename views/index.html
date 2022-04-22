@@ -23,13 +23,14 @@
 </div>
 <hr>
 <div>
+  <div style="text-align: right;"><small>※ 전일기준</small></div>
   <table role="grid">
     <thead>
       <tr>
         <th scope="col">No.</th>
         <th scope="col">코인명</th>
         <th scope="col">최고가</th>
-        <th scope="col">현재가</th>
+        <th scope="col">종가</th>
         <th scope="col">MDD</th>
       </tr>
     </thead>
@@ -38,9 +39,9 @@
       {% for mdd in mdds %}
       <tr>
         <td>{{ count }}</td>
-        <td><a href="/markets/{{ mdd.market }}">{{ mdd.korean_name }}</a></td>
+        <td><a href="/markets/{{ mdd.market_code }}">{{ mdd.korean_name }}</a></td>
         <td>{{ mdd.highest_price }}</td>
-        <td>{{ mdd.current_price }}</td>
+        <td>{{ mdd.trade_price }}</td>
         <td>{{ mdd.mdd }}%</td>
       </tr>
       {% set count = count + 1 %}
