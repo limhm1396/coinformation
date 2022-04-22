@@ -1,25 +1,27 @@
-const { 
+const {
     Market,
+    MarketHistory,
     SearchHistory,
- } = require('../models');
-
-const Coin = require('../modules/coin');
+} = require('../models');
 
 class Service {
-    static detail = async (marketCode) => {
+    static detail = async (marketCode, days = 30) => {
         const market = await Market.findOne({
             where: {
                 market: marketCode,
-            }
+            },
+            include: {
+                model: MarketHistory,
+                order: [['date', 'desc']],
+                limit: days,
+            },
         });
-        const histories = await Coin.getMarketHistories(marketCode);
-        histories.reverse();
-        return { market, histories };
+
+        return { market };
     }
 
     static recordVisitor = async (who, market) => {
-        const dt = new Date();
-        const date = `${dt.getFullYear()}-${dt.getMonth() + 1}-${dt.getDate()}`;
+        const date = new Date();
 
         await SearchHistory.findOrCreate({
             where: {

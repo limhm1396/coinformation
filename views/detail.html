@@ -13,7 +13,7 @@
     (async () => {
         const options = { method: 'GET', headers: { Accept: 'application/json' } };
         const res = await fetch(url, options);
-        const { market, histories } = await res.json();
+        const { market } = await res.json();
 
         document.querySelector('#heading')
             .textContent = `${market.ticker} | ${market.korean_name} | ${market.english_name}`;
@@ -23,7 +23,7 @@
                 label: `${market.ticker} 30 DAYS MDD`,
                 backgroundColor: '#039be5',
                 borderColor: '#039be5',
-                data: histories,
+                data: market.markets_histories,
             }]
         };
 

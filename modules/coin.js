@@ -109,24 +109,6 @@ class Coin {
     }
 
     /**
-     * @description 마켓 히스토리 조회
-     * @param {String} marketCode e.g. KRW-BTC
-     * @param {Number} days 조회기간 e.g. 30
-     * @returns {MarketHistory[]}
-     */
-    static getMarketHistories = async (marketCode, days = 30) => {
-        await this.updateMarketHistories(marketCode);
-
-        return await MarketHistory.findAll({
-            where: {
-                market: marketCode,
-            },
-            order: [['date', 'DESC']],
-            limit: days,
-        });
-    }
-
-    /**
      * @description 오늘 0시 0분 0초 Date 리턴
      * @returns Date
      */
