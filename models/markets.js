@@ -22,7 +22,7 @@ class Market extends Model {
             }
         }, {
             sequelize,
-            modelName: 'market',
+            modelName: 'market_origin',
             tableName: 'markets',
             timestamps: true,
             createdAt: false,
