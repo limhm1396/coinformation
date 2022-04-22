@@ -13,8 +13,7 @@ router.get('/popular/search', async (req, res, next) => {
 });
 
 router.get('/popular/search/detail', async (req, res, next) => {
-    const days = req.query.days;
-    const result = await Service.getPopularSearchCoin(days);
+    const result = await Service.getPopularSearchCoin();
     return res.send(result);
 });
 
