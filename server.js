@@ -18,12 +18,16 @@ sequelize.sync({ force: false, alter: false })
 const redis = require('./redis');
 redis.connect();
 
-// DB update
-const Coin = require('./modules/coin');
-Coin.updateAllMarketHistories()
-    .then(() => {
-        // listening
-        app.listen(app.get('port'), () => {
-            console.log(app.get('port'), 'port server is running!');
-        });
-    });
+// server open
+(async () => {
+    const main_cache = await redis.get('GET_MARKETS');
+    if (!main_cache) {
+        // market update
+        const Coin = require('./modules/coin');
+        await Coin.updateAllMarketHistories();
+    }
+
+    app.listen(app.get('port'), () => {
+        console.log(app.get('port'), 'port server is running!');
+    });s
+})();
