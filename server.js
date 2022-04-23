@@ -29,5 +29,5 @@ redis.connect();
 
     app.listen(app.get('port'), () => {
         console.log(app.get('port'), 'port server is running!');
-    });s
+    });
 })();
