@@ -1,10 +1,19 @@
+const path = require('path');
+
 // dotenv
 const dotenv = require('dotenv');
-dotenv.config();
+if (process.env.NODE_ENV === 'prd') {
+  dotenv.config({
+    path: path.resolve(process.cwd(), '.env_prd'),
+  });
+} else {
+  dotenv.config({
+    path: path.resolve(process.cwd(), '.env_local'),
+  });
+}
 
 const createError = require('http-errors');
 const express = require('express');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const nunjucks = require('nunjucks');
