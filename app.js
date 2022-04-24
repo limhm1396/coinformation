@@ -37,6 +37,9 @@ sequelize.sync({ force: false, alter: false })
 const redis = require('./redis');
 redis.connect();
 
+// cron
+const cron = require('./cron');
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

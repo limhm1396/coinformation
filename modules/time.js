@@ -3,9 +3,9 @@ exports.getTTL = () => {
     const newDate = new Date();
 
     newDate.setDate(newDate.getDate() + 1);
-    newDate.setHours(0);
+    newDate.setHours(1);
     newDate.setMinutes(0);
-    newDate.setSeconds(1);
+    newDate.setSeconds(0);
     newDate.setMilliseconds(0);
 
     const diff_second = (newDate - date) / 1000;

@@ -1,7 +1,6 @@
 const redis = require('../redis');
 const { Op } = require('sequelize');
 
-const Coin = require('../modules/coin');
 const { getTTL } = require('../modules/time');
 
 const {
@@ -11,21 +10,12 @@ const {
 
 class Service {
     static getMarkets = async () => {
-        const mdds = await redis.get('GET_MARKETS');
+        const mdds = await redis.get('GET:MARKETS');
 
         if (!mdds) {
-            await Coin.updateAllMarketHistories();
-
             const mdds = [];
-            const date = new Date();
-            date.setDate(date.getDate() - 1);
             const markets = await Market.findAll({
-                include: {
-                    model: MarketHistory,
-                    where: {
-                        date,
-                    },
-                },
+                include: this.getIncludeOptions(),
             });
 
             markets.forEach((market) => {
@@ -33,7 +23,7 @@ class Service {
             });
 
 
-            await redis.set('GET_MARKETS', JSON.stringify(mdds), {
+            await redis.set('GET:MARKETS', JSON.stringify(mdds), {
                 EX: getTTL(),
             });
 
@@ -45,8 +35,9 @@ class Service {
 
     static getSeachMarkets = async (q) => {
         const mdds = [];
-        const date = new Date();
-        date.setDate(date.getDate() - 1);
+
+        const incldue_options = this.getIncludeOptions();
+        incldue_options.limit = 1;
 
         const markets = await Market.findAll({
             where: {
@@ -62,12 +53,7 @@ class Service {
                     },
                 }
             },
-            include: {
-                model: MarketHistory,
-                where: {
-                    date,
-                },
-            },
+            include: incldue_options,
         });
 
         markets.forEach((market) => {
@@ -108,29 +94,31 @@ class Service {
                 method = 'ASC';
         }
 
-        const mdds = [];
-        const date = new Date();
-        date.setDate(date.getDate() - 1);
-        const find_options = {
-            include: {
-                model: MarketHistory,
-                where: {
-                    date,
-                },
-            },
-            order: [[MarketHistory, order, method]],
+        const mdds = await redis.get(`GET:MARKETS:${order}:${method}`);
+        if (!mdds) {
+            const mdds = [];
+            const find_options = {
+                include: this.getIncludeOptions(),
+                order: [[MarketHistory, order, method]],
+            }
+            if (o === 'nm' || order === 'ticker') {
+                find_options.order = [[order, method]];
+            }
+
+            const markets = await Market.findAll(find_options);
+
+            markets.forEach((market) => {
+                mdds.push(this.getMarketObj(market));
+            });
+
+            await redis.set(`GET:MARKETS:${order}:${method}`, JSON.stringify(mdds), {
+                EX: getTTL(),
+            });
+
+            return { mdds };
         }
-        if (o === 'nm' || order === 'ticker') {
-            find_options.order = [[order, method]];
-        }
 
-        const markets = await Market.findAll(find_options);
-
-        markets.forEach((market) => {
-            mdds.push(this.getMarketObj(market));
-        });
-
-        return { mdds };
+        return { mdds: JSON.parse(mdds) };
     };
 
     static getMarketObj(market) {
@@ -139,7 +127,7 @@ class Service {
         const korean_name = market.korean_name;
         const english_name = market.english_name;
 
-        const history = market.markets_histories[0];
+        const history = market.markets_histories[market.markets_histories.length - 1];
         const trade_price = Number(history.trade_price);
         const highest_price = Number(history.highest_price);
         const mdd = history.mdd;
@@ -152,6 +140,20 @@ class Service {
             trade_price: trade_price.toLocaleString('ko-kr'),
             highest_price: highest_price.toLocaleString('ko-kr'),
             mdd,
+        }
+
+        return obj;
+    }
+
+    static getIncludeOptions = () => {
+        const date = new Date();
+        date.setDate(date.getDate() - 1);
+
+        const obj = {
+            model: MarketHistory,
+            where: {
+                date,
+            },
         }
 
         return obj;

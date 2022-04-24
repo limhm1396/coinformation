@@ -3,7 +3,7 @@ const app = require('./app');
 // server open
 (async () => {
     const redis = require('./redis');
-    const main_cache = await redis.get('GET_MARKETS');
+    const main_cache = await redis.get('GET:MARKETS');
     if (!main_cache) {
         // market update
         const Coin = require('./modules/coin');
