@@ -2,6 +2,10 @@ const { Sequelize } = require('sequelize');
 
 const { config } = require('../config/config.js');
 
+if (process.env.NODE_ENV === 'prd') {
+    config.logging = false;
+}
+
 const sequelize = new Sequelize(config);
 
 const Market = require('./markets');
