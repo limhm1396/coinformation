@@ -17,12 +17,15 @@ class Service {
             await Coin.updateAllMarketHistories();
 
             const mdds = [];
+            const date = new Date();
+            date.setDate(date.getDate() - 1);
             const markets = await Market.findAll({
                 include: {
                     model: MarketHistory,
-                    order: [['date', 'DESC']],
-                    limit: 1
-                }
+                    where: {
+                        date,
+                    },
+                },
             });
 
             markets.forEach((market) => {
@@ -42,6 +45,8 @@ class Service {
 
     static getSeachMarkets = async (q) => {
         const mdds = [];
+        const date = new Date();
+        date.setDate(date.getDate() - 1);
 
         const markets = await Market.findAll({
             where: {
@@ -59,10 +64,67 @@ class Service {
             },
             include: {
                 model: MarketHistory,
-                order: [['date', 'DESC']],
-                limit: 1
-            }
+                where: {
+                    date,
+                },
+            },
         });
+
+        markets.forEach((market) => {
+            mdds.push(this.getMarketObj(market));
+        });
+
+        return { mdds };
+    };
+
+    static getOrderMarkets = async (o, m) => {
+        let order;
+        switch (o) {
+            case 'nm':
+                order = 'korean_name';
+                break;
+            case 'hp':
+                order = 'highest_price';
+                break;
+            case 'tp':
+                order = 'trade_price';
+                break;
+            case 'mdd':
+                order = 'mdd';
+                break;
+            default:
+                order = 'ticker';
+        }
+
+        let method;
+        switch (m) {
+            case 'DESC':
+                method = 'DESC';
+                break;
+            case 'ASC':
+                method = 'ASC';
+                break;
+            default:
+                method = 'ASC';
+        }
+
+        const mdds = [];
+        const date = new Date();
+        date.setDate(date.getDate() - 1);
+        const find_options = {
+            include: {
+                model: MarketHistory,
+                where: {
+                    date,
+                },
+            },
+            order: [[MarketHistory, order, method]],
+        }
+        if (o === 'nm' || order === 'ticker') {
+            find_options.order = [[order, method]];
+        }
+
+        const markets = await Market.findAll(find_options);
 
         markets.forEach((market) => {
             mdds.push(this.getMarketObj(market));
