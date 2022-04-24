@@ -2,6 +2,7 @@ const app = require('./app');
 
 // server open
 (async () => {
+    const redis = require('./redis');
     const main_cache = await redis.get('GET_MARKETS');
     if (!main_cache) {
         // market update
