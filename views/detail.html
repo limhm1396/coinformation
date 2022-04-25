@@ -18,12 +18,15 @@
         document.querySelector('#heading')
             .textContent = `${market.ticker} | ${market.korean_name} | ${market.english_name}`;
 
+        const histories = market.markets_histories;
+        histories.reverse();
+
         const data = {
             datasets: [{
                 label: `${market.ticker} 30 DAYS MDD`,
                 backgroundColor: '#039be5',
                 borderColor: '#039be5',
-                data: market.markets_histories,
+                data: histories,
             }]
         };
 
