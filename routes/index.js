@@ -20,6 +20,10 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/health', (req, res) => {
+  return res.sendStatus(200);
+});
+
 const marketRouter = require('./market');
 const statisticRouter = require('./statistic');
 
