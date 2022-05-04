@@ -171,6 +171,10 @@ class Coin {
             const json = await res.json();
             const data = Array.from(json);
 
+            if (data.length === 0) {
+                break;
+            }
+
             histories.push(...data);
 
             const end_dt = data[data.length - 1].candle_date_time_utc + 'Z';

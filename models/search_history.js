@@ -18,7 +18,10 @@ class SearchHistory extends Model {
                 allowNull: false,
                 primaryKey: true,
                 defaultValue: DataTypes.NOW(),
-            }
+            },
+            time: {
+                type: DataTypes.TIME,
+            },
         }, {
             sequelize,
             modelName: 'search_history',

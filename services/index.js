@@ -128,9 +128,9 @@ class Service {
         const english_name = market.english_name;
 
         const history = market.markets_histories[market.markets_histories.length - 1];
-        const trade_price = Number(history.trade_price);
-        const highest_price = Number(history.highest_price);
-        const mdd = history.mdd;
+        const trade_price = Number(history?.trade_price);
+        const highest_price = Number(history?.highest_price);
+        const mdd = history?.mdd;
 
         const obj = {
             market_code,
