@@ -1,3 +1,5 @@
+const pm2 = require('pm2');
+
 const app = require('./app');
 
 const { WebhookClient } = require('discord.js');
@@ -8,31 +10,21 @@ const redis = require('./redis');
 
 // server start
 (async () => {
-  // db connect
   try {
+    // db connect
     await sequelize.sync({ force: false, alter: false });
     console.log('DB start');
     await webhook.send({ content: new Date().toISOString() + ' / DB start' });
-  } catch (err) {
-    console.log('DB error');
-    await webhook.send({ content: new Date().toISOString() + ' / DB error' });
-  }
-
-  // redis connect
-  try {
+    
+    // redis connect
     await redis.connect();
     console.log('redis start');
     await webhook.send({ content: new Date().toISOString() + ' / redis start' });
-  } catch (err) {
-    console.log('redis error');
-    await webhook.send({ content: new Date().toISOString() + ' / redis error' });
-  }
 
-  // cron
-  const cron = require('./cron');
+    // cron
+    const cron = require('./cron');
 
-  // port open
-  try {
+    // port open
     const main_cache = await redis.get('GET:MARKETS');
     if (!main_cache) {
       // market update
@@ -45,7 +37,8 @@ const redis = require('./redis');
       await webhook.send({ content: new Date().toISOString() + ' / server start' });
     });
   } catch (err) {
-    console.log('server error');
-    await webhook.send({ content: new Date().toISOString() + ' / server error' });
+    console.log('ERROR');
+    await webhook.send({ content: new Date().toISOString() + ' / ERROR' });
+    pm2.restart('server');
   }
 })();
