@@ -1,3 +1,5 @@
+const { WebhookClient } = require('discord.js');
+
 const app = require('./app');
 
 // server open
@@ -11,6 +13,8 @@ const app = require('./app');
     }
 
     app.listen(app.get('port'), () => {
+        new WebhookClient({ url: process.env.DISCORD_WEBHOOK_SERVER_RESTART_BOT_URL })
+            .send({ content: 'Server Start' });
         console.log(app.get('port'), 'port server is running!');
     });
 })();
