@@ -32,29 +32,6 @@ nunjucks.configure(app.set('views'), {
   express: app,
 });
 
-// sequelize
-const { sequelize } = require('./models');
-sequelize.sync({ force: false, alter: false })
-  .then(() => {
-    console.log('DB is running.');
-  })
-  .catch(() => {
-    console.error('DB is shutdown.');
-  });
-
-// redis
-const redis = require('./redis');
-redis.connect()
-  .then(() => {
-    console.log('Redis is running.');
-  })
-  .catch(() => {
-    console.error('Redis is shutdown.');
-  });
-
-// cron
-const cron = require('./cron');
-
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
