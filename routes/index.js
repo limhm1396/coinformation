@@ -2,32 +2,23 @@ const express = require('express');
 
 const router = express.Router();
 
-const Service = require('../services');
+const { errorHandler } = require('../handler');
 
-/* GET home page. */
-router.get('/', async (req, res, next) => {
-  const { q, o, m } = req.query;
+const Main_Route = require('./main');
+const Makret_Route = require('./market');
+const Statistic_Route = require('./statistic');
 
-  if (q) {
-    const result = await Service.getSeachMarkets(q);
-    return res.render('index', result);
-  } else if (o) {
-    const result = await Service.getOrderMarkets(o, m);
-    return res.render('index', result);
-  } else {
-    const result = await Service.getMarkets();
-    return res.render('index', result);
-  }
-});
+// main
+router.get('/', errorHandler(Main_Route.getMain));
+router.get('/health', errorHandler(Main_Route.checkHealth));
 
-router.get('/health', (req, res) => {
-  return res.sendStatus(200);
-});
+// markets
+router.get('/markets/:market', errorHandler(Makret_Route.getMarket));
+router.get('/markets/:market/detail', errorHandler(Makret_Route.getMarketDetail));
 
-const marketRouter = require('./market');
-const statisticRouter = require('./statistic');
-
-router.use('/markets', marketRouter);
-router.use('/statistics', statisticRouter);
+// statistics
+router.get('/statistics', errorHandler(Statistic_Route.getMain));
+router.get('/statistics/popular/search', errorHandler(Statistic_Route.getPopularSearch));
+router.get('/statistics/popular/search/detail', errorHandler(Statistic_Route.getPopularSearchDetail));
 
 module.exports = router;

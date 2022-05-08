@@ -1,8 +1,10 @@
 const path = require('path');
 
+const PRD = 'prd';
+
 // dotenv
 const dotenv = require('dotenv');
-if (process.env.NODE_ENV === 'prd') {
+if (process.env.NODE_ENV === PRD) {
   dotenv.config({
     path: path.resolve(process.cwd(), '.env_prd'),
   });
@@ -46,10 +48,17 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(async function (err, req, res, next) {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  // res.locals.message = err.message;
+  // res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  if (process.env.NODE_ENV === PRD) {
+    const { WebhookClient } = require('discord.js');
+    const webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_SERVER_RESTART_BOT_URL });
+
+    await webhook.send({content: new Date().toISOString() + ` / ERROR_PATH: ${req.path}`});
+  }
 
   // render the error page
   res.status(err.status || 500);
