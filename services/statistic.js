@@ -24,6 +24,7 @@ class Service {
             },
             group: 'market_code',
             order: [[sequelize.fn('COUNT', sequelize.col('*')), 'DESC']],
+            limit: 10,
         });
 
         return { ranking };
