@@ -48,16 +48,24 @@ app.use(function (req, res, next) {
 });
 
 // error handler
+const { Log } = require('./models');
 app.use(async function (err, req, res, next) {
   // set locals, only providing error in development
   // res.locals.message = err.message;
   // res.locals.error = req.app.get('env') === 'development' ? err : {};
+  console.log(err);
+
+  await Log.create({
+    type: 'error',
+    path: req.path,
+    content: { message: err.message },
+  });
 
   if (process.env.NODE_ENV === PRD) {
     const { WebhookClient } = require('discord.js');
     const webhook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK_SERVER_RESTART_BOT_URL });
 
-    await webhook.send({content: new Date().toISOString() + ` / ERROR_PATH: ${req.path}`});
+    await webhook.send({ content: new Date().toISOString() + ` / ERROR_PATH: ${req.path}` });
   }
 
   // render the error page
